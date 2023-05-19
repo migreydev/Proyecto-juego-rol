@@ -7,13 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import elementos.Coordenada;
-import elementos.Element;
-import elementos.ElementType;
-import elementos.Jugador;
-import elementos.JugadorException;
-import elementos.PlayerType;
-
+import elementos.*;
+;
 public class Juego {
 
 	private Map<Coordenada, Element> tablero;
@@ -53,6 +48,12 @@ public class Juego {
 
 		if (elemento != null) { // Hay algo en la casilla
 			if (elemento instanceof Jugador) {
+				
+				Jugador enemigo=(Jugador)elemento;
+				int resultadoCombate=jugador.lucha(enemigo);
+				switch(resultadoCombate) {
+				
+				}
 				// Después de la lucha los jugadores no se mueven
 				resultado = luchar(resultado, jugador, coordDestino, elemento);
 				
@@ -100,8 +101,8 @@ public class Juego {
 		return resultado;
 	}
 
-	private String luchar(String resultado, Jugador jugador, Coordenada coordDestino, Element elemento) {
-		Jugador enemigo = (Jugador) elemento;
+	private String luchar(String resultado, Jugador jugador, Coordenada coordDestino, Jugador elemento) {
+		Jugador enemigo = elemento;
 		int resultadoLucha = jugador.lucha(enemigo);
 		switch (resultadoLucha) {
 		case Constantes.EMPATE:
@@ -138,17 +139,39 @@ public class Juego {
 		return resultado;
 	}
 
-	//TODO
-	private Coordenada getNextPosition(char direction) {
+	
+	private Coordenada getNextPosition(char direction) throws JuegoException{
+		Coordenada cor=this.coordenadaJugadores.get(jugadorJuega).clone();
+		if(direction=='N') {
+			cor.goUp();
+		}else if(direction=='S') {
+			cor.goDown();
+		}else if(direction=='E') {
+			cor.goRight();
+		}else if(direction=='O') {
+			cor.goLeft();
+		}else {
+			throw new JuegoException("La coordenada introducida no existe");
+		}
 		return null;
 	}
 
-	//TODO
+	
 	private void cambiaJugadorAPosicion(Coordenada coordDestino) {
+		
+		Coordenada cor=this.coordenadaJugadores.get(jugadorJuega);
+		Element player=(Element)this.tablero.get(cor);
+		tablero.remove(cor);
+		tablero.put(cor, player);
+		this.coordenadaJugadores.remove(jugadorJuega);
+		this.coordenadaJugadores.add(jugadorJuega,cor);
+		
 	}
 
-	//TODO
+	
 	private void eliminarJugador(Coordenada coordDestino) {
+		this.tablero.remove(coordDestino);
+		this.coordenadaJugadores.remove(coordDestino);
 	}
 
 
@@ -192,16 +215,26 @@ public class Juego {
 
 	//TODO
 	public boolean isTerminado() {
-		return false;
+		boolean terminado=false;
+		if(coordenadaJugadores.size()==1) {
+			terminado=true;
+		}
+		for (Element elemento : this.tablero.values()) {
+			if(elemento instanceof Jugador player && player.getDinero()==Constantes.DINERO) {
+				terminado=true;
+			}
+		}
+		return terminado;
 	}
 
-	//TODO
+	
 	public int getValorDado() {
-		return 0;
+		return dado;
 	}
 
 	//TODO
 	public void setDado() {
+		
 	}
 
 	//TODO
@@ -233,4 +266,5 @@ public class Juego {
 		
 	}
 }
+
 
