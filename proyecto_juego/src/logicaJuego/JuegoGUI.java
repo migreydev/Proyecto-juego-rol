@@ -17,10 +17,14 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import elementos.Coordenada;
+import elementos.Element;
+import elementos.ElementType;
 import elementos.JugadorException;
 import elementos.PlayerType;
 import static logicaJuego.Constantes.IMAGE_ICON_DIRECTORY;
 import static logicaJuego.Constantes.TAMANNO;
+
+
 
 public class JuegoGUI extends Juego implements ActionListener {
 
@@ -95,46 +99,57 @@ public class JuegoGUI extends Juego implements ActionListener {
 
 	// Devuelve el icono correspondiente según el elemento
 	private void asignarIcono(JButton button, int x, int y) {
-		ImageIcon imageIcon;
+	    ImageIcon imageIcon;
 
-		// Si no hay nada se pone el elemento por defecto
-		if (super.obtenerElementoTablero(new Coordenada(x, y)) == null) {
-			imageIcon = getDefaultImageIcon();
-		} else {
-			switch(super.obtenerElementoTablero(new Coordenada(x,y)).getType().getSymbol()) {
-			case 'D':
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/dinero.png");
-				break;
-			case 'P':
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/pocion.png");
-				break;
-			case 'R':
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/roca.png");
-				break;
-			case 'Y':
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/gema.png");
-				break;
-			case 'E':
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/elfo.png");
-				break;
-			case 'G':
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/guerrero.png");
-				break;
-			case 'M':
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/mago.png");
-				break;
-			case 'O':
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/ogro.png");
-				break;
-			default:
-				imageIcon=new ImageIcon(System.getProperty("user.dir")+ "/img/nada.png");
-				break;
-			}
+	    // Obtener el elemento en la coordenada
+	    Element elemento = super.obtenerElementoTablero(new Coordenada(x, y));
 
-		}
+	    // Si el elemento es nulo, asignar un icono predeterminado
+	    if (elemento == null) {
+	        imageIcon = getDefaultImageIcon();
+	    } else {
+	        // Obtener el tipo del elemento y asignar el icono correspondiente
+	        ElementType tipo = elemento.getType();
+	        if (tipo != null) {
+	            switch (tipo.getSymbol()) {
+	                // Asignar iconos según el tipo de elemento
+	                case 'D':
+	                    imageIcon = new ImageIcon(System.getProperty("user.dir") + "/img/dinero.png");
+	                    break;
+	                case 'P':
+	                    imageIcon = new ImageIcon(System.getProperty("user.dir") + "/img/pocion.png");
+	                    break;
+	                case 'R':
+	                    imageIcon = new ImageIcon(System.getProperty("user.dir") + "/img/roca.png");
+	                    break;
+	                case 'Y':
+	                    imageIcon = new ImageIcon(System.getProperty("user.dir") + "/img/gema.png");
+	                    break;
+	                case 'E':
+	                    imageIcon = new ImageIcon(System.getProperty("user.dir") + "/img/elfo.png");
+	                    break;
+	                case 'G':
+	                    imageIcon = new ImageIcon(System.getProperty("user.dir") + "/img/guerrero.png");
+	                    break;
+	                case 'M':
+	                    imageIcon = new ImageIcon(System.getProperty("user.dir") + "/img/mago.png");
+	                    break;
+	                case 'O':
+	                    imageIcon = new ImageIcon(System.getProperty("user.dir") + "/img/ogro.png");
+	                    break;
+	                default:
+	                    imageIcon = getDefaultImageIcon();
+	                    break;
+	            }
+	        } else {
+	            imageIcon = getDefaultImageIcon();
+	        }
+	    }
 
-		button.setIcon(imageIcon);
+	    // Asignar el icono al botón
+	    button.setIcon(imageIcon);
 	}
+
 
 	
 	protected ImageIcon getImageIcon(String imagen) {
@@ -155,86 +170,7 @@ public class JuegoGUI extends Juego implements ActionListener {
 	}
 
 	
-	/** 
-	 * Controla el juego
-	 */
-	@Override
-	public void actionPerformed(ActionEvent e) {
 
-		// Cojo el botón que han pulsado
-		JButton bx = (JButton) e.getSource();
-		// Busco dónde está el botón en el cuadrante de botones
-		for (int i = 0; i < Constantes.TAMANNO; i++)
-			for (int j = 0; j < Constantes.TAMANNO; j++)
-				if (botones[i][j] == bx) { // Encuentro la coordenada i y j donde se ha pulsadlo
-					// Saco las coordenadas donde se encuentra el jugador
-					Coordenada coord = super.obtenerCoordenadaJugadorJuega();
-					// Si las x son iguales, miro a ver si las y tienen una diferencia de 1
-					String resul = "";
-					if (i == coord.getX()) {
-						if (j - coord.getY() == 1) {
-							try {
-								resul = super.moverJugador('S');
-							} catch (JuegoException | JugadorException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						} else if (j - coord.getY() == -1) {
-							try {
-								resul = super.moverJugador('N');
-							} catch (JuegoException | JugadorException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						} else {
-							resul = "Movimiento no permitido";
-						}
-					} else if (j == coord.getY()) { // Si la y es igual, miro a ver si hay una diferencia de 1 en la x
-						if (i - coord.getX() == 1) {
-							try {
-								resul = super.moverJugador('E');
-							} catch (JuegoException | JugadorException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						} else if (i - coord.getX() == -1) {
-							try {
-								resul = super.moverJugador('O');
-							} catch (JuegoException | JugadorException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						} else {
-							resul = "Movimiento no permitido";
-						}
-					} else {
-						resul = "Movimiento no permitido";
-					}
-					if (resul.length() != 0)
-						JOptionPane.showMessageDialog(ventana, resul, "Info", JOptionPane.ERROR_MESSAGE);
-					setInformacion();
-					super.decrementaDado();
-				}
-
-		if (super.isTerminado())
-
-		{
-			JOptionPane.showMessageDialog(ventana, "Juego terminado. El ganador es:" + super.getGanador());
-			System.exit(0);
-		}
-
-		actualizarIconos();
-		if (super.getValorDado() <= 0)
-
-		{
-			super.proximoJugador();
-			super.setDado(getValorDado());
-			setInformacion();
-			JOptionPane.showMessageDialog(ventana, "Le toca al jugador " + super.getNombreJuegadorQueJuega()
-					+ ". El dado saca " + super.getValorDado() + " movimientos");
-
-		}
-	}
 
 	/**
 	 * Actualizar iconos, necesario cuando se cambia de casillas algún jugador.
@@ -245,6 +181,30 @@ public class JuegoGUI extends Juego implements ActionListener {
 			for (int j = 0; j < Constantes.TAMANNO; j++) {
 				asignarIcono(botones[i][j], i, j);
 			}
+	}
+	
+	public static void main(String[] args) {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                crearInterfaz();
+            }
+        });
+    }
+	
+	 private static void crearInterfaz() {
+	        try {
+	            PlayerType[] jugadores = {PlayerType.GUERRERO, PlayerType.ELFO};
+	            JuegoGUI juego = new JuegoGUI(jugadores);
+	        } catch (JuegoException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
